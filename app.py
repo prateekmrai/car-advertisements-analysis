@@ -9,11 +9,15 @@ st.title('Car Advertisements Analysis')
 df = pd.read_csv('vehicles_us.csv')
 
 # Handle missing values for 'cylinders' column using groupby and median
-df['cylinders'] = df.groupby(['model', 'year'])['cylinders'].transform(lambda x: x.fillna(x.median()))
+if 'model' in df.columns and 'year' in df.columns:
+    df['cylinders'] = df.groupby(['model', 'year'])['cylinders'].transform(lambda x: x.fillna(x.median()))
+else:
+    st.error("The dataset does not contain the required 'model' or 'year' columns.")
 
 # Filter options
 price_filter = st.slider('Select price range', 0, int(df['price'].max()), (0, int(df['price'].max() / 2)))
-filtered_df = df[df['price'].between(price_filter[0], price_filter[1])]
+odometer_filter = st.slider('Select odometer range', 0, int(df['odometer'].max()), (0, int(df['odometer'].max() / 2)))
+filtered_df = df[df['price'].between(price_filter[0], price_filter[1]) & df['odometer'].between(odometer_filter[0], odometer_filter[1])]
 
 # Display the dataframe
 st.header('Dataset Overview')
